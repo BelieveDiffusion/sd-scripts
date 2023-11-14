@@ -220,6 +220,40 @@ def train(args):
     ) = sdxl_train_util.load_target_model(args, accelerator, "sdxl", weight_dtype)
     # logit_scale = logit_scale.to(accelerator.device, dtype=weight_dtype)
 
+	# --- ADD
+
+    # Add special tokens.
+    tokenizers = [tokenizer1, tokenizer2]
+    text_encoders = [text_encoder1, text_encoder2]
+
+	# Just use one vector for the new token for now.
+	token_strings = ["crchfv", "knlfcg", "lwdknb", "sfptfg", "ltgfvr"]
+
+	# Add the tokens with no weights.
+    for i, (tokenizer, text_encoder) in enumerate(zip(tokenizers, text_encoders)):
+
+		accelerator.print(f"adding {len(token_strings)} tokens for tokenizer {i+1}")
+        
+		num_added_tokens = tokenizer.add_tokens(token_strings)
+		assert (
+			num_added_tokens == 1
+		), f"tokenizer has the same word as token string. please use another one."
+
+		token_ids = tokenizer.convert_tokens_to_ids(token_strings)
+		accelerator.print(f"tokens are added for tokenizer {i+1}: {token_ids}")
+		assert (
+			min(token_ids) == token_ids[0] and token_ids[-1] == token_ids[0] + len(token_ids) - 1
+		), f"token ids is not ordered : tokenizer {i+1}, {token_ids}"
+		assert (
+			len(tokenizer) - 1 == token_ids[-1]
+		), f"token ids is not end of tokenize: tokenizer {i+1}, {token_ids}, {len(tokenizer)}"
+
+		# Resize the token embeddings as we are adding new special tokens to the tokenizer
+		text_encoder.resize_token_embeddings(len(tokenizer))
+		# text_encoder.resize_token_embeddings(len(tokenizer),pad_to_multiple_of=128)
+
+	# --- ADD
+
     # verify load/save model formats
     if load_stable_diffusion_format:
         src_stable_diffusion_ckpt = args.pretrained_model_name_or_path
