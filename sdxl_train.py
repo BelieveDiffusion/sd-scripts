@@ -236,8 +236,8 @@ def train(args):
         
         num_added_tokens = tokenizer.add_tokens(token_strings)
         assert (
-            num_added_tokens == 1
-        ), f"tokenizer has the same word as token string. please use another one."
+            num_added_tokens == len(token_strings)
+        ), f"tokenizer has the same word as token string. please use another one (count: {num_added_tokens})."
 
         token_ids = tokenizer.convert_tokens_to_ids(token_strings)
         accelerator.print(f"tokens are added for tokenizer {i+1}: {token_ids}")
