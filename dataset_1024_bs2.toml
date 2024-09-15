@@ -1,0 +1,21 @@
+[general]
+flip_aug = false
+color_aug = false
+random_crop = false
+shuffle_caption = false
+caption_tag_dropout_rate = 0
+caption_extension = ".txt"
+
+[[datasets]]
+enable_bucket = true
+resolution = [1024,1024]
+bucket_reso_steps = 64
+max_bucket_reso = 2048
+min_bucket_reso = 128
+bucket_no_upscale = true
+batch_size = 40
+
+  [[datasets.subsets]]
+  image_dir = "/workspace/fine_tune/train_data/Dataset_Flux_05_A"
+  num_repeats = 1
+  caption_extension = ".txt"
